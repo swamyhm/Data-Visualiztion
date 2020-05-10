@@ -1,0 +1,72 @@
+```{r}
+bostoncrime <- read.csv("~/Downloads/tmpf2ieb74l.csv", stringsAsFactors=FALSE)
+```
+
+```{r}
+rqd_df=summarise(group_by(bostoncrime, DISTRICT, DAY_OF_WEEK),NUMBER_OF_INCIDENTS = n())
+rqd_df
+```
+
+```{r}
+p1<-ggplot(rqd_df, aes(y=NUMBER_OF_INCIDENTS,x=DISTRICT,fill=DAY_OF_WEEK )) +geom_bar(stat="identity") +coord_flip()
+p1
+```
+```{r}
+new_df <- filter(bostoncrime, SHOOTING == "Y")
+new_df1 = summarise(group_by(new_df, DISTRICT, DAY_OF_WEEK),NUMBER_OF_SHOOTINGS = n())
+new_df1
+```
+```{r}
+ggplot(new_df1, aes(x=DISTRICT, y=DAY_OF_WEEK, fill=NUMBER_OF_SHOOTINGS)) + geom_tile() 
+```
+```{r}
+new_df2 <- filter(bostoncrime, SHOOTING == "Y")
+new_df3 = summarise(group_by(new_df, DAY_OF_WEEK),NUMBER_OF_SHOOTINGS = n())
+new_df3
+```
+```{r}
+ggplot(data = new_df3, aes(x = DAY_OF_WEEK, y = NUMBER_OF_SHOOTINGS, group=1)) + geom_line(color="red")
+```
+```{r}
+new_df4 <- filter(bostoncrime, SHOOTING == "Y")
+new_df5 = summarise(group_by(new_df4,YEAR,DAY_OF_WEEK),NUMBER_OF_SHOOTINGS = n())
+new_df5
+```
+```{r}
+ggplot(data = new_df5, aes(x = DAY_OF_WEEK, y = NUMBER_OF_SHOOTINGS, group=1))+facet_grid(rows = vars(YEAR))+geom_line(color="blue")+theme_minimal()
+```
+```{r}
+new_df6 = summarise(group_by(bostoncrime,YEAR, DAY_OF_WEEK),NUMBER_OF_INCIDENTS = n())
+new_df6
+```
+```{r}
+ggplot(data = new_df6, aes(x=DAY_OF_WEEK, y = NUMBER_OF_INCIDENTS))+ geom_boxplot() + stat_summary(fun.y=mean, geom="point", size=3,color="blue")
+```
+```{r}
+CRIME_MONTH <- bostoncrime %>% 
+  filter() %>% 
+  group_by(MONTH) %>%
+  summarise(NUMBER_OF_INCIDENTS = n()) %>%
+  ungroup() %>%
+  arrange(desc(NUMBER_OF_INCIDENTS))
+
+# Frequency of crime by month wise:
+ggplot(CRIME_MONTH, aes(x = reorder(MONTH, NUMBER_OF_INCIDENTS), y = NUMBER_OF_INCIDENTS)) + 
+  geom_point(size = 12, stat = "identity", color = "red") + 
+  geom_text(aes(label = NUMBER_OF_INCIDENTS, fontface = "bold"), color = "black", size = 2) + 
+  theme_minimal(base_size = 20) + 
+  xlab("MONTH") + ylab("COUNT") + 
+  ggtitle("Frequency of crime month wise") +
+  scale_y_continuous(limits=c(0,max(CRIME_MONTH$NUMBER_OF_INCIDENTS+2000)))
+```
+```{r}
+crime_data <- bostoncrime
+
+  
+temp1 <- aggregate(crime_data$YEAR, by = list(crime_data$YEAR, crime_data$OFFENSE_CODE_GROUP), FUN= length)
+names(temp1) <- c("YEAR","OFFENSE_CODE_GROUP","count")
+ggplot(temp1, aes(x= YEAR, y= OFFENSE_CODE_GROUP, fill= count)) + geom_tile(aes(fill= count))
+geom_text(aes(label = n, fontface = "bold"), color = "black", size =0.001)
+```
+
+
